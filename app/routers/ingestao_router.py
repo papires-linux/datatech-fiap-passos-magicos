@@ -14,10 +14,8 @@ class IngestaoResponse(BaseModel):
     status: str
     detalhe: str | None = None
 
-
 # ---------------- RAW ---------------- #
-@router.post(
-    "/raw",
+@router.post(    "/raw",
     summary="Executa ingestão RAW",
     description="Executa a etapa de extração e grava os dados na camada RAW.",
     response_model=IngestaoResponse,
@@ -26,6 +24,7 @@ class IngestaoResponse(BaseModel):
         500: {"description": "Erro durante a execução da etapa RAW"}
     }
 )
+
 def ingestao_raw():
     try:
         ingestao.executar_raw()
@@ -42,10 +41,8 @@ def ingestao_raw():
             detalhe=str(e)
         )
 
-
 # ---------------- TRUSTED ---------------- #
-@router.post(
-    "/trusted",
+@router.post(    "/trusted",
     summary="Executa ingestão TRUSTED",
     description="Executa transformação e tratamento dos dados na camada TRUSTED.",
     response_model=IngestaoResponse,
@@ -54,6 +51,7 @@ def ingestao_raw():
         500: {"description": "Erro durante a execução da etapa TRUSTED"}
     }
 )
+
 def ingestao_trusted():
     try:
         ingestao.executar_trusted()
@@ -72,8 +70,7 @@ def ingestao_trusted():
 
 
 # ---------------- REFINED ---------------- #
-@router.post(
-    "/refined",
+@router.post(    "/refined",
     summary="Executa ingestão REFINED",
     description="Executa agregações e modelagem final na camada REFINED.",
     response_model=IngestaoResponse,
