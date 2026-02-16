@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.routers.model_router    import router as model_router
 from app.routers.ingestao_router import router as ingestao_router
 
 VERSION_API = "1.0.0"
@@ -22,3 +23,4 @@ def get_version():
 
 # Incluindo as rotas dos módulos
 app.include_router(ingestao_router)
+app.include_router(model_router)

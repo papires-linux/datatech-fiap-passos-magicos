@@ -178,3 +178,7 @@ pyrightconfig.json
 #parquet
 parquet/
 anots/
+
+#airflow
+
+docker-composer/logs/*
