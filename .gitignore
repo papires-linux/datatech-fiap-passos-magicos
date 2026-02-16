@@ -182,3 +182,7 @@ anots/
 #airflow
 
 docker-composer/logs/*
+
+#Não subir os modelos no git
+app/model/*
+
