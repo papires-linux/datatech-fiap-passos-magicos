@@ -1,46 +1,189 @@
+# Documentação do Projeto -- datatech-fiap-passos-magicos
 
+## 1. Visão geral
 
+Este projeto implementa uma API de Machine Learning com pipeline de ingestão de dados, treinamento de modelo e deploy automatizado
+utilizando:
 
+-   FastAPI para a API
+-   Scikit-learn para o modelo
+-   Airflow para orquestração
+-   Docker para containerização
+-   Testes automatizados
 
+O objetivo principal é prever defasagem com base em dados de entrada,
+expondo o modelo por meio de uma API.
 
-## Fazer o build do conteiner da ingestão de dados 
+------------------------------------------------------------------------
 
+## 2. Arquitetura do projeto
 
-Certifique que o pc que vc fez o download do codigo tenha o docker instalado. 
+    datatech-fiap-passos-magicos
+    │
+    ├── app/
+    │   ├── main.py
+    │   ├── model/
+    │   │   └── modelo_defasagem.joblib
+    │   └── routers/
+    │       ├── ingestao_router.py
+    │       └── model_router.py
+    │
+    ├── src/
+    │   ├── api_ingestao/
+    │   ├── model/
+    │   ├── evaluate.py
+    │   └── metrics.json
+    │
+    ├── notebook/
+    │   └── modelo.ipynb
+    │
+    ├── docker-composer/
+    │   ├── dags/
+    │   ├── config/
+    │   └── docker-compose.yaml
+    │
+    ├── tests/
+    │   ├── test_api.py
+    │   └── testes.csv
+    │
+    ├── Dockerfile
+    ├── requirements.txt
+    └── README.md
 
-Faz o build para que a imagem seja gerado no seu pc. Ou, utiliza a imagem disponivel no docker hub ()
+------------------------------------------------------------------------
 
-```bash 
-docker build -t api-datathon:v1.0.0 .
-````
+## 3. Fluxo geral do sistema
 
-Para executar a run da imagem, executa o seguinte comando: 
+1.  Ingestão de dados
+2.  Treinamento do modelo
+3.  Avaliação do modelo
+4.  Deploy via Airflow
+5.  API para predição
 
-```bash 
-docker run -p 8008:8000 -d api-datathon:v1.0.0
+------------------------------------------------------------------------
+
+## 4. API 
+![diagrama_airflow](app/docs/figuras/doc_api.jpg)
+[Documentação API](app/README.md)
+
+### Endpoint principal
+
+    POST /predict
+
+### Exemplo de requisição
+
+``` json
+{
+  "feature_1": 10,
+  "feature_2": 5
+}
 ```
 
-Para verificar se o container subiu com sucesso, execute esse seguintes comandos:
-```bash
-docker ps | grep -i api-datathon
+### Resposta
+
+``` json
+{
+  "prediction": 1
+}
 ```
-ou 
-```web
-http://localhost:8008/health
-```
 
+------------------------------------------------------------------------
 
-# Fazer manualmente a ingestão dos dados pela api:
+## 5. Treinamento do modelo
 
+Arquivo principal:
 
-### RAW
-curl --location --request POST 'http://127.0.0.1:8008/ingestao/raw' --data ''
+    src/model/build_model.py
 
-### TRUSTED
-curl --location --request POST 'http://127.0.0.1:8008/ingestao/trusted' --data ''
+Responsável por: - Carregar dataset - Treinar modelo de ML - Salvar
+modelo com joblib
 
-### REFINED
-curl --location --request POST 'http://127.0.0.1:8008/ingestao/refined' --data ''
+Saída:
 
+    app/model/modelo_defasagem.joblib
 
+------------------------------------------------------------------------
+
+## 6. Avaliação do modelo
+
+Arquivo:
+
+    src/evaluate.py
+
+Gera métricas como: - Accuracy - Precision - Recall - F1-score
+
+Resultado:
+
+    src/metrics.json
+
+------------------------------------------------------------------------
+
+## 7. Orquestração com Airflow
+![diagrama_airflow](app/docs/figuras/figura_airflow.jpg)
+[Documentação ambiente](docker-composer/README.md)
+
+Local:
+
+    docker-composer/
+
+DAG principal:
+
+    dag_cicd_deploy_modelo.py
+
+Função: 1. Ingestão 2. Treinamento 3. Avaliação 4. Deploy
+
+------------------------------------------------------------------------
+
+## 8. Docker
+
+### Build
+
+    docker build -t api-defasagem .
+
+### Run
+
+    docker run -p 8000:8000 api-defasagem
+
+Acessar: - http://localhost:8000 - http://localhost:8000/docs
+
+------------------------------------------------------------------------
+
+## 9. Testes automatizados
+
+Executar:
+
+    pytest tests/
+
+------------------------------------------------------------------------
+
+## 10. Dependências
+
+Instalar:
+
+    pip install -r requirements.txt
+
+Principais libs: - fastapi - uvicorn - scikit-learn - pandas - joblib -
+pytest
+
+------------------------------------------------------------------------
+
+## 11. Execução local
+
+### Rodar API
+
+    uvicorn app.main:app --reload
+
+Acessar:
+
+    http://localhost:8000/docs
+
+### Treinar modelo
+
+    python src/model/build_model.py
+
+### Avaliar modelo
+
+    python src/evaluate.py
+
+------------------------------------------------------------------------
 

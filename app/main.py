@@ -2,6 +2,10 @@ from fastapi import FastAPI
 
 from app.routers.model_router    import router as model_router
 from app.routers.ingestao_router import router as ingestao_router
+from logging_config import setup_logger
+import logging
+
+logger = setup_logger()
 
 VERSION_API = "1.0.0"
 
@@ -15,6 +19,7 @@ app = FastAPI(
 
 @app.get("/health")
 def get_version():
+    logger.info("get_version")
     return {
         "VERSAO" : VERSION_API,
         "STATUS" : "OK"
