@@ -162,10 +162,10 @@ docker rm <container_id>
 # 📦 Estrutura do Projeto
 ```css
 app/
-.
 ├── README.md
 ├── main.py
-├── model
+├── model/
+│   └── modelo_defasagem.joblib
 ├── docs
 │   └── figuras
 │       ├── doc_api.jpg
