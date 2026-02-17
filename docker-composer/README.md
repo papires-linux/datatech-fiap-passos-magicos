@@ -44,6 +44,7 @@ Necessário para evitar erros de permissão nos volumes do Airflow:
 sudo chmod -R 777 ./config
 sudo chmod -R 777 ./logs
 sudo chmod -R 777 ./dags
+echo -e "AIRFLOW_UID=$(id -u)" > .env
 ```
 
 #### 3️⃣ Inicializar o banco do Airflow

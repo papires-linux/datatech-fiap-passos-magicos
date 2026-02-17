@@ -7,7 +7,6 @@ router = APIRouter(
     tags=["Ingestão de Dados"]
 )
 
-
 # Modelo padrão de resposta
 class IngestaoResponse(BaseModel):
     etapa: str
@@ -67,7 +66,6 @@ def ingestao_trusted():
             status="ERRO",
             detalhe=str(e)
         )
-
 
 # ---------------- REFINED ---------------- #
 @router.post(    "/refined",

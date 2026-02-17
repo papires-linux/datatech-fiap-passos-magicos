@@ -10,6 +10,7 @@ router = APIRouter(
     prefix="/model",
     tags=["Modelagem de Dados"]
 )
+
 MODEL_PATH = os.path.join("app", "model", "modelo_defasagem.joblib")
 
 try:
@@ -102,13 +103,12 @@ def predict(aluno: AlunoInput):
             "probabilidade_risco": float(round(prob, 4)),
             "classificacao": "Risco" if classificacao == 1 else "Sem Risco"
         }
-
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/avaliacao",
-    summary="Faz a predição com o modelo treinado",
-    description="Executa a predição com o modelo treinado carregado do disco.",
+    summary="Faz a avaliacao do modelo treinado",
+    description="Executa a avaliacao com o modelo treinado carregado do disco.",
     response_model=dict,
     status_code=status.HTTP_200_OK,
     responses={
