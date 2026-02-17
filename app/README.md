@@ -162,14 +162,17 @@ docker rm <container_id>
 # 📦 Estrutura do Projeto
 ```css
 app/
-│
+.
+├── README.md
 ├── main.py
-├── model/
-│   └── modelo_defasagem.joblib
-│
-├── ingestao/
-├── pipeline/
-└── requirements.txt
+├── model
+├── docs
+│   └── figuras
+│       ├── doc_api.jpg
+│       └── figura_airflow.jpg
+└── routers
+    ├── ingestao_router.py
+    └── model_router.py
 ```
 
 # 👨‍💻 Desenvolvido para

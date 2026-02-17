@@ -7,15 +7,11 @@ docker-composer/
 │
 ├── docker-compose.yaml      # Orquestração dos containers
 ├── .env                     # Variáveis de ambiente
-│
 ├── dags/                    # DAGs do Airflow
 │   └── dag_cicd_deploy_modelo.py
-│
 ├── config/
 │   └── airflow.cfg          # Configuração do Airflow
-│
 ├── logs/                    # Logs das execuções
-│
 └── plugins/                 # Plugins customizados (se houver)
 
 ```
