@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.ensemble import GradientBoostingClassifier
+# from sklearn.ensemble import RandomForestClassifier
 
 
 # ==============================
@@ -14,12 +15,12 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 BD_MODELO = os.getenv(
     "BD_MODELO",
-    "/Users/paulopires/git/FIAP-Datathon/parquet/refined/refined.parquet"
+    "parquet/refined/refined.parquet"
 )
 
 PATH_MODEL = os.getenv(
     "PATH_MODEL",
-    "/Users/paulopires/git/FIAP-Datathon/app/model/modelo_defasagem.joblib"
+    "app/model/modelo_defasagem.joblib"
 )
 
 RANDOM_STATE = 42
@@ -34,19 +35,30 @@ THRESHOLD = 0.35
 def carregar_dados(path: str) -> pd.DataFrame:
     df = pd.read_parquet(path)
 
-    # Criar target binário
-    df["defasagem_binaria"] = (df["defasagem"] != 0).astype(int)
+    # Garantir que os valores estão no range esperado
+    valores_validos = set(range(-4, 5))
+    valores_encontrados = set(df["defasagem"].unique())
 
+    if not valores_encontrados.issubset(valores_validos):
+        raise ValueError(
+            f"Valores inesperados encontrados em 'defasagem': {valores_encontrados - valores_validos}"
+        )
+
+    # Criar target binário: atraso = 0
+    # df["defasagem_binaria"] = (df["defasagem"] > 0).astype(int)
+    df["risco_defasagem"] = (df["defasagem"] <= 0).astype(int)
+    
     return df
-
 
 # ==============================
 # PREPARAÇÃO DOS DADOS
 # ==============================
 
 def preparar_dados(df: pd.DataFrame):
-    X = df.drop(columns=["defasagem", "defasagem_binaria"])
-    y = df["defasagem_binaria"]
+    # X = df.drop(columns=["defasagem", "defasagem_binaria"])
+    # y = df["defasagem_binaria"]
+    X = df.drop(columns=["defasagem", "risco_defasagem"])
+    y = df["risco_defasagem"]
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -66,12 +78,12 @@ def preparar_dados(df: pd.DataFrame):
 def treinar_modelo(X_train, y_train):
 
     model = GradientBoostingClassifier(
-        n_estimators=500,
-        learning_rate=0.05,
-        max_depth=4,
+        n_estimators=100,
+        learning_rate=0.1,
+        max_depth=5,
         random_state=RANDOM_STATE
     )
-
+    
     model.fit(X_train, y_train)
 
     return model
@@ -120,7 +132,7 @@ def salvar_modelo(model, path: str):
 
 def avaliar_modelo_teste( coluna_target: str):
     caminho_modelo = PATH_MODEL
-    caminho_csv = os.getenv("CAMINHO_CSV_TESTE", "/Users/paulopires/git/FIAP-Datathon/tests/testes.csv")
+    caminho_csv = os.getenv("CAMINHO_CSV_TESTE", "tests/testes.csv")
 
     from sklearn.metrics import (
         accuracy_score,
@@ -140,19 +152,35 @@ def avaliar_modelo_teste( coluna_target: str):
     :return: dicionário com métricas
     """
     
-    # 1️⃣ Carregar modelo
+    # Carregar modelo
+    print(f"Carregando modelo do caminho: {caminho_modelo}")
     model = joblib.load(caminho_modelo)
     
-    # 2️⃣ Carregar dados
+    # Carregar dados
     df = pd.read_csv(caminho_csv)
-    
-    # 3️⃣ Separar X e y
+    print(f"Dados de teste carregados do caminho: {caminho_csv}")
+    print(f"Número de linhas: {len(df)}")
+
+    # Separar X e y
+    df[coluna_target] = (df[coluna_target] <= 0).astype(int)
     X_test = df.drop(coluna_target, axis=1)
     y_test = df[coluna_target]
+
+    print("\nDistribuição da variável alvo:")
+    # print(df["defasagem_binaria"].value_counts(normalize=True))
+
+    # Fazer previsões
+    # y_pred = model.predict(X_test)
+
+    if hasattr(model, "predict_proba"):
+        y_proba = model.predict_proba(X_test)[:, 1]
+        y_pred = (y_proba >= THRESHOLD).astype(int)
+        roc_auc = roc_auc_score(y_test, y_proba)
+    else:
+        y_pred = model.predict(X_test)
+        roc_auc = None    
     
-    # 4️⃣ Fazer previsões
-    y_pred = model.predict(X_test)
-    
+    print(f"Número de previsões: {len(y_pred)}")
     # Se o modelo tiver predict_proba
     if hasattr(model, "predict_proba"):
         y_proba = model.predict_proba(X_test)[:, 1]
@@ -161,7 +189,8 @@ def avaliar_modelo_teste( coluna_target: str):
         y_proba = None
         roc_auc = None
     
-    # 5️⃣ Calcular métricas
+    print(f"Previsões feitas. Avaliando métricas...")
+    # Calcular métricas
     resultados = {
         "accuracy": accuracy_score(y_test, y_pred),
         "precision": precision_score(y_test, y_pred),

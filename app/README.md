@@ -42,14 +42,97 @@ Previsão binária de risco de defasagem escolar:
 
 Gradient Boosting Classifier
 
-## 📈 Métricas Obtidas
+📊 Avaliação do Modelo
 
-- Accuracy: 85%
-- Recall (classe risco): 84%
-- Precision: 91%
-- AUC: 0.91
+O modelo de predição de risco de defasagem apresentou desempenho elevado no conjunto de teste (200 amostras), com as seguintes métricas:
+```json
+{
+    "accuracy": 0.805,
+    "precision": 0.7194244604316546,
+    "recall": 1.0,
+    "f1_score": 0.8368200836820083,
+    "roc_auc": 0.9891,
+    "confusion_matrix": [
+        [
+            61,
+            39
+        ],
+        [
+            0,
+            100
+        ]
+    ]
+}
+```
 
-O modelo apresenta alta capacidade de identificar alunos em risco.
+## 📊 Resultados do Modelo – Risco de Defasagem Escolar
+
+O modelo de classificação binária para previsão de risco de defasagem escolar apresentou os seguintes resultados no conjunto de teste:
+
+🔢 Métricas Gerais
+Accuracy: 80,5%
+Precision: 71,94%
+Recall: 100%
+F1-Score: 83,68%
+ROC AUC: 0,9891
+
+## 📌 Interpretação das Métricas
+### ✅ Recall = 100%
+
+O modelo identificou todos os estudantes com risco de defasagem.
+Não houve nenhum falso negativo.
+
+Isso é extremamente importante em contexto educacional, pois evita deixar de identificar alunos em risco.
+
+### ⚠️ Precision = 71,94%
+
+Entre os alunos classificados como "em risco", aproximadamente 72% realmente estavam em risco.
+
+Isso indica a presença de falsos positivos, o que significa que alguns alunos foram sinalizados como risco sem realmente estarem em defasagem.
+
+### 🎯 F1-Score = 83,68%
+
+O F1-score mostra um bom equilíbrio entre precisão e recall, com maior peso para a alta sensibilidade do modelo.
+
+### 📈 ROC AUC = 0,9891
+
+Indica excelente capacidade de separação entre as classes.
+O modelo distingue muito bem alunos com e sem risco.
+
+### 📊 Matriz de Confusão
+	Predito: Sem Risco	Predito: Com Risco
+Real: Sem Risco	61	39
+Real: Com Risco	0	100
+🔎 Análise
+
+100 alunos em risco foram corretamente identificados
+
+0 falsos negativos
+
+39 falsos positivos
+
+61 verdadeiros negativos
+
+🏫 Interpretação de Negócio
+
+O modelo foi ajustado para priorizar sensibilidade (recall máximo), garantindo que nenhum aluno em risco deixe de ser identificado.
+
+Essa abordagem é adequada para políticas educacionais preventivas, onde é preferível:
+
+✔ Identificar todos os alunos em risco
+✔ Mesmo que alguns alunos sejam sinalizados preventivamente
+
+### 🚀 Conclusão
+
+O modelo demonstra:
+
+Excelente capacidade discriminativa (AUC ≈ 0,99)
+
+Sensibilidade máxima (Recall = 1.0)
+
+Bom equilíbrio geral (F1 > 0.83)
+
+Ele está adequado para uso como ferramenta de apoio à tomada de decisão em programas de intervenção educacional.
 
 ---
 
@@ -113,6 +196,17 @@ curl --location --request POST 'http://127.0.0.1:8008/ingestao/refined' --data '
 
 Recebe dados do aluno e retorna probabilidade de risco.
 
+🎯 O que isso significa na prática?
+Situação	Interpretação
+DEFASAGEM = 0	Aluno está no nível adequado
+DEFASAGEM > 0	Aluno está atrasado (defasagem positiva)
+DEFASAGEM < 0	Aluno pode estar adiantado
+
+Com isso:
+DEFASAGEM > 0 → risco de defasagem
+DEFASAGEM = 0 → sem risco
+
+
 Exemplo de Request:
 ```json
 {
@@ -139,10 +233,42 @@ Exemplo de Request:
 Exemplo de Response:
 ```json
 {
-  "probabilidade_risco": 0.8721,
-  "classificacao": "Risco"
+    "probabilidade_risco": 0.0006,
+    "classificacao": "Sem Risco"
 }
 ```
+Outro exemplo:
+```json
+{
+  "inde": 8.7,
+  "iaa": 9.2,
+  "ieg": 9.2,
+  "ips": 7.5,
+  "ida": 8.5,
+  "matematica": 7.5,
+  "portugues": 8.0,
+  "ipv": 8.1,
+  "ian": 10.0,
+  "ano_ingresso": 2024,
+  "genero_feminino": 1,
+  "genero_masculino": 0,
+  "pedra_agata": 0,
+  "pedra_ametista": 0,
+  "pedra_quartzo": 0,
+  "pedra_topazio": 1,
+  "idade": 12
+}
+````
+
+Resposta: 
+```json
+{
+    "probabilidade_risco": 0.9445,
+    "classificacao": "Risco"
+}
+```
+
+
 
 🔍 Endpoints Disponíveis
 ```table

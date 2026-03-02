@@ -43,7 +43,20 @@ sudo chmod -R 777 ./dags
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 ```
 
-#### 3️⃣ Inicializar o banco do Airflow
+#### 3️⃣ Fazer deploy da api modelo
+Execute esse comando na raiz do projeto que você fez o download do git:
+```bash 
+docker build -t api-datathon:v2.0.0 . 
+```
+
+Validar se o nome e a versão da imagem estão certo no `docker-compose.yaml`
+```
+  api-datathon:
+    image: api-datathon:v2.0.0
+    container_name: api-datathon
+```
+
+#### 4️⃣ Inicializar o banco do Airflow
 Esse comando cria as tabelas internas:
 ```bash 
 docker compose up airflow-init

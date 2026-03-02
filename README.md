@@ -1,6 +1,5 @@
 # Documentação do Projeto -- datatech-fiap-passos-magicos
 
-
 ## 1. Visão geral
 
 Este projeto implementa uma API de Machine Learning com pipeline de ingestão de dados, treinamento de modelo e deploy automatizado
@@ -34,9 +33,6 @@ expondo o modelo por meio de uma API.
     │   ├── model/
     │   ├── evaluate.py
     │   └── metrics.json
-    │
-    ├── notebook/
-    │   └── modelo.ipynb
     │
     ├── docker-composer/
     │   ├── dags/
@@ -187,4 +183,8 @@ Acessar:
     python src/evaluate.py
 
 ------------------------------------------------------------------------
+
+# 👨‍💻 Desenvolvido para
+
+Datathon FIAP – Passos Mágicos
 
