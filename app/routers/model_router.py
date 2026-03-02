@@ -13,10 +13,16 @@ router = APIRouter(
 
 MODEL_PATH = os.path.join("app", "model", "modelo_defasagem.joblib")
 
-try:
-    model = joblib.load(MODEL_PATH)
-except Exception as e:
-    raise RuntimeError(f"Erro ao carregar modelo: {e}")
+def load_model():
+    print(f"Carregando modelo do caminho: {MODEL_PATH}")
+    if not os.path.exists(MODEL_PATH):
+        print("Modelo não encontrado.")
+        return None
+    
+    try:
+        return joblib.load(MODEL_PATH)
+    except Exception:
+        return None
 
 # --------------------------------------------------
 # Endpoint de predição
@@ -62,15 +68,6 @@ def build():
 
     return {"message": "Modelo treinado e salvo com sucesso!"}
 
-@router.post("/predict",
-    summary="Faz a predição com o modelo treinado",
-    description="Executa a predição com o modelo treinado carregado do disco.",
-    response_model=dict,
-    status_code=status.HTTP_200_OK,
-    responses={
-        500: {"description": "Erro durante a execução da etapa de predição do modelo. Verifica os dados de entrada e o processo de predição."}
-    }
-)
 def predict(aluno: AlunoInput):
     try:
         dados = np.array([[
@@ -125,3 +122,47 @@ def avaliacao():
 
 
 
+
+
+@router.post("/predict")
+def predict(aluno: AlunoInput):
+
+    model = load_model()
+
+    if model is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Modelo não encontrado. Execute /model/deploy primeiro."
+        )
+
+    try:
+        dados = np.array([[
+            aluno.inde,
+            aluno.iaa,
+            aluno.ieg,
+            aluno.ips,
+            aluno.ida,
+            aluno.matematica,
+            aluno.portugues,
+            aluno.ipv,
+            aluno.ian,
+            aluno.ano_ingresso,
+            aluno.genero_feminino,
+            aluno.genero_masculino,
+            aluno.pedra_agata,
+            aluno.pedra_ametista,
+            aluno.pedra_quartzo,
+            aluno.pedra_topazio,
+            aluno.idade
+        ]])
+
+        prob = model.predict_proba(dados)[0][1]
+        classificacao = 1 if prob >= 0.5 else 0
+
+        return {
+            "probabilidade_risco": float(round(prob, 4)),
+            "classificacao": "Risco" if classificacao == 1 else "Sem Risco"
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

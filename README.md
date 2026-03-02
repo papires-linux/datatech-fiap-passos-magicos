@@ -34,9 +34,6 @@ expondo o modelo por meio de uma API.
     │   ├── evaluate.py
     │   └── metrics.json
     │
-    ├── notebook/
-    │   └── modelo.ipynb
-    │
     ├── docker-composer/
     │   ├── dags/
     │   ├── config/
@@ -186,4 +183,8 @@ Acessar:
     python src/evaluate.py
 
 ------------------------------------------------------------------------
+
+# 👨‍💻 Desenvolvido para
+
+Datathon FIAP – Passos Mágicos
 

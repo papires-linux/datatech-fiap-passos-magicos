@@ -338,7 +338,7 @@ services:
 
 
   api-datathon:
-    image: paulopires/api-datathon:v1.0.0
+    image: api-datathon:v2.0.0
     container_name: api-datathon
     hostname: api-datathon.local
     environment:
